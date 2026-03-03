@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+# 1. El Bridge: Captura datos del espacio y los sirve en el puerto 9000
   rtk-bridge:
     build: .
     container_name: galileo_bridge
@@ -9,4 +10,24 @@ services:
               -out tcpsvr://:9000
     ports:
       - "9000:9000"
+    restart: always
+
+# 2. La Base de Datos: Guarda los números de satélites
+  influxdb:
+    image: influxdb:1.8
+    container_name: galileo_db
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=galileo_data
+    restart: always
+
+# 3. La Visualización: El dashboard para LinkedIn
+  grafana:
+    image: grafana/grafana
+    container_name: galileo_viz
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
     restart: always

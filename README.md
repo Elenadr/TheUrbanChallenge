@@ -39,3 +39,19 @@ Proyecto en desarrollo para fomentar el uso de la soberanía tecnológica europe
 |--|--|--|
 | Binary Output (Garbage) | Los datos llegaban en binario RTCM3, ilegibles para un parser de texto estándar. | Implementación de un decodificador avanzado con la librería pyrtcm para interpretar los frames binarios directamente.|
 |--|--|--|
+
+
+
+## Estructura de archivos
+
+1. Archivo: docker-compose.yml
+
+Este es el director de orquesta. Define cómo se comunican los contenedores.
+
+2. Archivo: src/monitor.py
+
+Este es el "cerebro" que procesa el binario y lo guarda en la base de datos.
+
+3. 
+
+
