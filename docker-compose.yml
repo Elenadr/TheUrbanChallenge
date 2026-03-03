@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  rtklib:
+    image: t0mpr1c3/rtklib  # Una imagen ligera con las herramientas GNSS
+    container_name: galileo_bridge
+    command: >
+      str2str -in ntrip://ergnss-ip.ign.es:21012/MADR0 
+              -out tcpsvr://:9000
+    ports:
+      - "9000:9000"
+    restart: always
