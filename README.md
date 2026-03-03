@@ -30,9 +30,12 @@ Proyecto en desarrollo para fomentar el uso de la soberanía tecnológica europe
 ----
 ## Troubleshooting
 
-|--|--|--|
+
 | Desafío | Diagnóstico del errpr | Solución |
+|--|--|--|
 |Docker Daemon Error | Docker motor was not installed by default on Kali | Install docker.io, manage services with systemctl and configuration of group permisions|
+|--|--|--|
 | 401 Unauthorized | Error de autenticación en los servidores NTRIP.  | Depuración de credenciales y validación de sintaxis en la cadena de conexión de str2str. |
+|--|--|--|
 | Binary Output (Garbage) | Los datos llegaban en binario RTCM3, ilegibles para un parser de texto estándar. | Implementación de un decodificador avanzado con la librería pyrtcm para interpretar los frames binarios directamente.|
 |--|--|--|
