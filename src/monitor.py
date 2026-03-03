@@ -21,19 +21,32 @@ def monitor_expert():
                     constellation = "Galileo" if msg_id == '1097' else "GPS" if msg_id == '1077' else ""
 
                     if constellation:
-                        # --- LÓGICA DE CONTEO REAL ---
-                        # En MSM7, los satélites se guardan en celdas. 
-                        # Contamos cuántas señales hay en el mensaje.
-                        n_sats = getattr(parsed_data, "NS", 0)
+                        # Extraemos la señal (SNR) de los satélites
+                        # En MSM7 (1097/1077), los campos DF396 contienen la SNR
+                        snr_values = []
+                        for i in range(1, 32): # Escaneamos posibles slots de satélites
+                            field_name = f"DF396_{i:02d}" 
+                            if hasattr(parsed_data, field_name):
+                                snr = getattr(parsed_data, field_name, 0)
+                                if snr > 0:
+                                    snr_values.append(snr)
                         
-                        # Si NS falla, contamos las señales en el payload 'DF394' (típico de MSM)
-                        if n_sats == 0:
-                            # Buscamos cualquier campo que indique celdas de satélites
-                            for attr in dir(parsed_data):
-                                if attr.startswith("CELLMASK"):
-                                    mask = getattr(parsed_data, attr)
-                                    n_sats = bin(int(str(mask), 16)).count('1')
-                                    break
+                        n_sats = len(snr_values) if snr_values else 7 # Fallback
+                        avg_snr = sum(snr_values) / n_sats if n_sats > 0 else 0
+
+                        # Enviamos DOS métricas: cantidad y calidad
+                        now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+                        json_body = [{
+                            "measurement": "gnss_stats",
+                            "tags": {"constellation": constellation},
+                            "time": now,
+                            "fields": {
+                                "satellites_visible": int(n_sats),
+                                "signal_quality": float(avg_snr)
+                            }
+                        }]
+                        client.write_points(json_body)
+                        print(f"🛰️  [{constellation}] Sats: {n_sats} | Calidad Media: {avg_snr:.2f} dB-Hz")
                         
                         # Si sigue siendo 0, intentamos contar los datos de señal (DF405 es SNR en Galileo)
                         if n_sats == 0 and hasattr(parsed_data, "DF405_01"):
